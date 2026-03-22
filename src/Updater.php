@@ -16,7 +16,7 @@ namespace Ramic\Rsync;
  */
 class Updater
 {
-    private const GITHUB_REPO   = 'ramic/php-rsync';
+    private const GITHUB_REPO   = 'ramic-dev/php-rsync';
     private const CHECK_INTERVAL = 3600; // seconds between API calls
 
     private readonly string $libRoot;
