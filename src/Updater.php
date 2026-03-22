@@ -270,7 +270,9 @@ class Updater
 
     private function copyDir(string $src, string $dst): void
     {
-        mkdir($dst, 0755, true);
+        if (!is_dir($dst)) {
+            mkdir($dst, 0755, true);
+        }
         $iter = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($src, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::SELF_FIRST,
@@ -278,7 +280,9 @@ class Updater
         foreach ($iter as $item) {
             $target = $dst . substr($item->getPathname(), strlen($src));
             if ($item->isDir()) {
-                mkdir($target, 0755, true);
+                if (!is_dir($target)) {
+                    mkdir($target, 0755, true);
+                }
             } else {
                 copy($item->getPathname(), $target);
             }
