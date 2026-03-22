@@ -5,19 +5,21 @@ declare(strict_types=1);
 
 /**
  * Sync remote/.ramic_tools/ to the Altervista receiver.
- * Reads SYNCGATE_KEY and SYNCGATE_URL from .env in the same directory.
+ * Reads SYNCGATE_KEY and SYNCGATE_URL from .env in the project root.
  *
  * Usage:  php sync-remote.php
  */
 
 // ── Autoload (no Composer needed) ────────────────────────────────────────────
 
-spl_autoload_register(static function (string $class): void {
+$libRoot = dirname(__DIR__); // tools/ → project root
+
+spl_autoload_register(static function (string $class) use ($libRoot): void {
     $prefix = 'Ramic\\Rsync\\';
     if (!str_starts_with($class, $prefix)) {
         return;
     }
-    $file = __DIR__ . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+    $file = $libRoot . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
     if (file_exists($file)) {
         require_once $file;
     }
@@ -25,7 +27,7 @@ spl_autoload_register(static function (string $class): void {
 
 // ── Load .env ─────────────────────────────────────────────────────────────────
 
-$envFile = __DIR__ . '/.env';
+$envFile = $libRoot . '/.env';
 if (!file_exists($envFile)) {
     fwrite(STDERR, "Missing .env file. Copy .env.example and fill in your values.\n");
     exit(1);
@@ -56,7 +58,7 @@ if ($url === '') {
 
 use Ramic\Rsync\Rsync;
 
-$source = __DIR__ . '/remote/';
+$source = $libRoot . '/remote/';
 
 echo "Syncing $source → $url\n";
 
