@@ -1,0 +1,10 @@
+# Allow HTTP access to this hidden directory.
+# Apache denies dot-prefixed directories by default;
+# this override restores access so receiver.php is reachable.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>

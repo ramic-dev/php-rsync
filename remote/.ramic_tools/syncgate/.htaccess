@@ -1,0 +1,16 @@
+# Use PHP 8 on Altervista (av-php8 handler is Altervista-specific; safe to remove on other hosts).
+AddHandler av-php8 .php
+
+# Disable directory listings.
+Options -Indexes
+
+# Deny direct HTTP access to the .env config file.
+<Files ".env">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>

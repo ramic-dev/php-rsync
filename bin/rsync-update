@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Check GitHub for a newer version of ramic/php-rsync and install it.
+ *
+ * Usage:
+ *   php bin/rsync-update [--verbose]
+ *
+ * Exit codes:
+ *   0 — already up to date
+ *   1 — update installed (restart any long-running processes)
+ *   2 — error
+ */
+
+$autoload = dirname(__DIR__) . '/vendor/autoload.php';
+if (file_exists($autoload)) {
+    require $autoload;
+} else {
+    // Fallback: manual PSR-4 loader (no Composer needed).
+    spl_autoload_register(static function (string $class): void {
+        $prefix = 'Ramic\\Rsync\\';
+        if (!str_starts_with($class, $prefix)) {
+            return;
+        }
+        $file = dirname(__DIR__) . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    });
+}
+
+use Ramic\Rsync\Updater;
+
+$verbose = in_array('--verbose', $argv ?? [], true);
+$logger  = $verbose ? fn(string $msg) => print("[update] $msg\n") : null;
+
+$updater = new Updater(logger: $logger);
+$current = Updater::getInstalledVersion();
+
+if ($verbose) {
+    echo "[update] Installed version: $current\n";
+}
+
+try {
+    $updated = $updater->checkAndUpdate();
+    exit($updated ? 1 : 0);
+} catch (\Throwable $e) {
+    fwrite(STDERR, '[update] Error: ' . $e->getMessage() . "\n");
+    exit(2);
+}

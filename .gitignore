@@ -1,0 +1,6 @@
+/vendor/
+composer.lock
+.phpunit.result.cache
+# Local environment files — never commit secrets
+.env
+remote/.ramic_tools/syncgate/.env
