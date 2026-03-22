@@ -228,12 +228,16 @@ class Updater
             // GitHub wraps everything in a top-level dir (e.g. ramic-php-rsync-abc123/).
             $extractedRoot = $this->findExtractedRoot($tmpDir);
 
-            // 3. Replace src/, remote/, bin/ and VERSION atomically per-directory.
+            // 3. Replace src/, remote/, bin/ and VERSION.
+            // Copy-over rather than delete-then-copy: avoids the Windows
+            // restriction on deleting files that are currently open/executing
+            // (e.g. bin/rsync-update running itself). Files removed from a
+            // newer release are not cleaned up automatically — acceptable
+            // trade-off for a small library.
             foreach (['src', 'remote', 'bin'] as $dir) {
                 $src = "$extractedRoot/$dir";
                 $dst = "$this->libRoot/$dir";
                 if (is_dir($src)) {
-                    $this->rmdirRecursive($dst);
                     $this->copyDir($src, $dst);
                 }
             }
